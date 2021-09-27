@@ -14,6 +14,13 @@ public class ClientHandler implements Runnable {
     Scanner sc;
     BlockingQueue<String> queue;
 
+    public PrintWriter getPw() {
+        return pw;
+    }
+
+    public Scanner getSc() {
+        return sc;
+    }
 
     public ClientHandler(Socket client, BlockingQueue<String> queue) throws IOException {
         this.client = client;
@@ -28,11 +35,13 @@ public class ClientHandler implements Runnable {
         String msg = "";
         StringBuilder res;
         String[] arrOfStr;
+        boolean closeConnection = false;
 
-        while (!msg.equals("CLOSE#")) {
-            msg = sc.nextLine();
+        while (!closeConnection) {
+            msg = sc.nextLine(); //Blocking call
             res = null;
             arrOfStr = msg.split("#", 2);
+
 
             try {
                 msg = arrOfStr[1];
@@ -41,23 +50,26 @@ public class ClientHandler implements Runnable {
             }
 
             switch (arrOfStr[0]) {
-                case "UPPER":
-                    msg = msg.toUpperCase();
+                case "CONNECT":
+                    if (Server.listOfUsers.contains(msg)){
+                        Server.listOfOnlineUsers.add(msg);
+                        pw.println("ONLINE");
+                    } else {
+                        msg = "CLOSE#2";
+                    }
                     break;
-                case "LOWER":
-                    msg = msg.toLowerCase();
+                case "SEND":
+                    String[] sendArr = msg.split("#", 2);
+                    //Send besked til sendArr[0] med beskeden sendArr[1]
                     break;
-                case "REVERSE":
-                    res = new StringBuilder(msg);
-                    res = res.reverse();
-                    msg = res.toString();
-                case "ALL":
-                    //indsæt besked i delt ressource
-                    queue.add(msg);
+                case "CLOSE":
+                    closeConnection = true;
                     break;
+
                 default:
                     msg = "No message";
             }
+
             pw.println(msg);
 
             //Den læser og/eller sletter første element i message queuen
