@@ -18,7 +18,9 @@ public class Dispatcher implements Runnable{
 
         while (true) {
             for (ClientHandler c : clients) {
-                c.pw.println("Hej fra Dispatcher");
+                if (c.name != null && c.name.equals("Peter")) {
+                    c.pw.println("Hej fra Dispatcher");
+                }
             }
             try {
                 Thread.sleep(100);

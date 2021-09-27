@@ -13,6 +13,7 @@ public class ClientHandler implements Runnable {
     PrintWriter pw;
     Scanner sc;
     BlockingQueue<String> queue;
+    String name;
 
     public PrintWriter getPw() {
         return pw;
@@ -53,6 +54,7 @@ public class ClientHandler implements Runnable {
                 case "CONNECT":
                     if (Server.listOfUsers.contains(msg)){
                         Server.listOfOnlineUsers.add(msg);
+                        name = msg;
                         pw.println("ONLINE");
                     } else {
                         msg = "CLOSE#2";
