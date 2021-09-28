@@ -36,16 +36,15 @@ public class ClientHandler implements Runnable {
 
     public void protocol() throws IOException {
 
-        String msg = "";
-        StringBuilder res;
+        String msg;
         String[] arrOfStr;
         boolean closeConnection = false;
 
+        pw.println("Please enter username to continue:");
         while (!closeConnection) {
-            msg = sc.nextLine(); //Blocking call
-            res = null;
-            arrOfStr = msg.split("#", 2);
 
+            msg = sc.nextLine(); //Blocking call
+            arrOfStr = msg.split("#", 2);
 
             try {
                 msg = arrOfStr[1];
@@ -55,7 +54,7 @@ public class ClientHandler implements Runnable {
 
             switch (arrOfStr[0]) {
                 case "CONNECT":
-                    if (Server.listOfUsers.contains(msg)){
+                    if (Server.listOfUsers.contains(msg) && !online){
                         Server.listOfOnlineUsers.add(msg);
                         name = msg;
                         pw.println("ONLINE");
@@ -70,34 +69,25 @@ public class ClientHandler implements Runnable {
                     name = "";
                     online = false;
                     dispatcher.connectMsg();
+                    pw.println("OFFLINE");
                     break;
                 case "SEND":
                     String[] sendArr = msg.split("#", 2);
-                    dispatcher.sendMsg(sendArr[0], sendArr[1]);
+                    dispatcher.sendMsg(sendArr[0], sendArr[1], name);
                     break;
                 case "CLOSE":
                     Server.listOfOnlineUsers.remove(name);
                     closeConnection = true;
+                    pw.println("CLOSE#0");
                     break;
 
                 default:
                     msg = "No message";
             }
 
-            pw.println(msg);
-
-            //messagePrinter();
-
         }
         client.close();
     }
-
-    public void messagePrinter() {
-        if (queue.size() > 0) {
-            pw.println(queue.peek());
-        }
-    }
-
 
     @Override
     public void run() {
