@@ -14,6 +14,8 @@ public class ClientHandler implements Runnable {
     Scanner sc;
     BlockingQueue<String> queue;
     String name;
+    Dispatcher dispatcher;
+    boolean online = false;
 
     public PrintWriter getPw() {
         return pw;
@@ -23,11 +25,12 @@ public class ClientHandler implements Runnable {
         return sc;
     }
 
-    public ClientHandler(Socket client, BlockingQueue<String> queue) throws IOException {
+    public ClientHandler(Socket client, BlockingQueue<String> queue, Dispatcher dispatcher) throws IOException {
         this.client = client;
         this.pw = new PrintWriter(client.getOutputStream(), true);
         this.sc = new Scanner(client.getInputStream());
         this.queue = queue;
+        this.dispatcher = dispatcher;
     }
 
 
@@ -56,15 +59,24 @@ public class ClientHandler implements Runnable {
                         Server.listOfOnlineUsers.add(msg);
                         name = msg;
                         pw.println("ONLINE");
+                        online = true;
+                        dispatcher.connectMsg();
                     } else {
                         msg = "CLOSE#2";
                     }
                     break;
+                case "LOGOUT":
+                    Server.listOfOnlineUsers.remove(name);
+                    name = "";
+                    online = false;
+                    dispatcher.connectMsg();
+                    break;
                 case "SEND":
                     String[] sendArr = msg.split("#", 2);
-                    //Send besked til sendArr[0] med beskeden sendArr[1]
+                    dispatcher.sendMsg(sendArr[0], sendArr[1]);
                     break;
                 case "CLOSE":
+                    Server.listOfOnlineUsers.remove(name);
                     closeConnection = true;
                     break;
 
@@ -74,11 +86,7 @@ public class ClientHandler implements Runnable {
 
             pw.println(msg);
 
-            //Den læser og/eller sletter første element i message queuen
-            //find en måde at printe nye beskeder så snart de sendes,
-            //da sc.nextline() blokerer tråden, så messagePrinter() kun kaldes når man
-            //selv har sendt en besked.
-            messagePrinter();
+            //messagePrinter();
 
         }
         client.close();

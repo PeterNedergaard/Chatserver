@@ -16,16 +16,33 @@ public class Dispatcher implements Runnable{
     @Override
     public void run() {
 
-        while (true) {
-            for (ClientHandler c : clients) {
-                if (c.name != null && c.name.equals("Peter")) {
-                    c.pw.println("Hej fra Dispatcher");
-                }
+//        while (true) {
+//            for (ClientHandler c : clients) {
+//                if (c.name != null && c.name.equals("Peter")) {
+//                    c.pw.println("Hej fra Dispatcher");
+//                }
+//            }
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+    }
+
+    public void sendMsg(String name, String msg){
+        for (ClientHandler c : clients) {
+            if (c.name != null && c.name.equals(name) && c.online) {
+                c.pw.println(msg);
             }
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        }
+    }
+
+
+    public void connectMsg(){
+        for (ClientHandler c : clients) {
+            if (c.online) {
+                c.pw.println("ONLINE#" + Server.listOfOnlineUsers.toString());
             }
         }
     }

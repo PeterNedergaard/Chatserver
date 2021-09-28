@@ -28,16 +28,14 @@ public class Server {
 
         ServerSocket serverSocket = new ServerSocket(port);
 
-        Thread t1 = new Thread(new Dispatcher(clients));
-        t1.start();
-        //Dispatcher dispatcher = new Dispatcher(clients);
+        Dispatcher dispatcher = new Dispatcher(clients);
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         while (true) {
             Socket client = serverSocket.accept();
 
-            ClientHandler cl = new ClientHandler(client,queue);
+            ClientHandler cl = new ClientHandler(client,queue, dispatcher);
 
             clients.add(cl);
 
@@ -45,4 +43,6 @@ public class Server {
         }
 
     }
+
+
 }
