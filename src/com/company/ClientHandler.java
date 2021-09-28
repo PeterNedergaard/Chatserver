@@ -13,17 +13,10 @@ public class ClientHandler implements Runnable {
     PrintWriter pw;
     Scanner sc;
     BlockingQueue<String> queue;
+    BlockingQueue<String> messages;
     String name;
     Dispatcher dispatcher;
     boolean online = false;
-
-    public PrintWriter getPw() {
-        return pw;
-    }
-
-    public Scanner getSc() {
-        return sc;
-    }
 
     public ClientHandler(Socket client, BlockingQueue<String> queue, Dispatcher dispatcher) throws IOException {
         this.client = client;
