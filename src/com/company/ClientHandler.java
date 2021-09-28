@@ -6,28 +6,29 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientHandler implements Runnable {
     Socket client;
     PrintWriter pw;
     Scanner sc;
-    BlockingQueue<String> queue;
-    BlockingQueue<String> messages;
+    BlockingQueue<Message> messages;
     String name;
     Dispatcher dispatcher;
     boolean online = false;
 
-    public ClientHandler(Socket client, BlockingQueue<String> queue, Dispatcher dispatcher) throws IOException {
+    public ClientHandler(Socket client, BlockingQueue<Message> messages, Dispatcher dispatcher) throws IOException {
         this.client = client;
         this.pw = new PrintWriter(client.getOutputStream(), true);
         this.sc = new Scanner(client.getInputStream());
-        this.queue = queue;
+        this.messages = messages;
         this.dispatcher = dispatcher;
     }
 
 
-    public void protocol() throws IOException {
+    public void protocol() throws IOException, InterruptedException {
 
         String msg;
         String[] arrOfStr;
@@ -66,7 +67,7 @@ public class ClientHandler implements Runnable {
                     break;
                 case "SEND":
                     String[] sendArr = msg.split("#", 2);
-                    dispatcher.sendMsg(sendArr[0], sendArr[1], name);
+                    messages.put(new Message(sendArr[0], sendArr[1], name));
                     break;
                 case "CLOSE":
                     Server.listOfOnlineUsers.remove(name);
@@ -88,7 +89,7 @@ public class ClientHandler implements Runnable {
             while (true) {
                 this.protocol();
             }
-        } catch (IOException io) {
+        } catch (IOException | InterruptedException io) {
             io.printStackTrace();
         }
     }

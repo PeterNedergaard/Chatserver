@@ -22,20 +22,25 @@ public class Server {
         listOfUsers.add("Rabee");
         listOfUsers.add("Knud");
 
-        BlockingQueue<String> queue = new ArrayBlockingQueue<>(50);
+        BlockingQueue<Message> messages = new ArrayBlockingQueue<>(50);
 
         CopyOnWriteArrayList<ClientHandler> clients = new CopyOnWriteArrayList<>();
 
         ServerSocket serverSocket = new ServerSocket(port);
 
-        Dispatcher dispatcher = new Dispatcher(clients);
+        Dispatcher dispatcher = new Dispatcher(clients,messages);
+
+//        Thread t1 = new Thread(dispatcher);
+//        t1.start();
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+        executorService.execute(dispatcher);
 
         while (true) {
             Socket client = serverSocket.accept();
 
-            ClientHandler cl = new ClientHandler(client,queue, dispatcher);
+            ClientHandler cl = new ClientHandler(client,messages,dispatcher);
 
             clients.add(cl);
 
