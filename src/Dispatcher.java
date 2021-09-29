@@ -1,7 +1,3 @@
-package com.company;
-
-import java.io.PrintWriter;
-import java.util.Scanner;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -60,6 +56,7 @@ public class Dispatcher implements Runnable {
                     c.pw.println("MESSAGE#" + sender + "#" + msg);
                 } else if(!Server.listOfOnlineUsers.contains(name)) {
                     sendMsg(c.name, name + " not found", "Server");
+                    return;
                 }
             }
         }

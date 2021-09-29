@@ -1,14 +1,9 @@
-package com.company;
-
-import com.sun.java.accessibility.util.Translator;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientHandler implements Runnable {
     Socket client;
@@ -30,14 +25,19 @@ public class ClientHandler implements Runnable {
 
     public void protocol() throws IOException, InterruptedException {
 
-        String msg;
+        String msg = "";
         String[] arrOfStr;
         boolean closeConnection = false;
 
         pw.println("Please enter username to continue:");
         while (!closeConnection) {
 
-            msg = sc.nextLine(); //Blocking call
+            try {
+                msg = sc.nextLine(); //Blocking call
+            }catch (NoSuchElementException nse){
+                client.close();
+            }
+
             arrOfStr = msg.split("#", 2);
 
             try {
